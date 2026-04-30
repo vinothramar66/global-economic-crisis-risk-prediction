@@ -1,0 +1,507 @@
+
+<h2 class="sr-only">Global Economic Crisis Risk Dashboard: Analysis of 47 countries from 2000 to 2035 covering collapse probability, inflation trends, ML model results, and future economic outlook.</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.dash{padding:1rem 0}
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:8px}
+.top-bar h1{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{padding:6px 14px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);transition:all .15s}
+.tab.active{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.panel{display:none}.panel.active{display:block}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.85rem 1rem}
+.metric .label{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
+.metric .val{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.metric .sub{font-size:11px;color:var(--color-text-tertiary)}
+.chart-wrap{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;margin-bottom:1rem}
+.chart-title{font-size:13px;font-weight:500;color:var(--color-text-secondary);margin-bottom:.75rem}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px;font-size:12px;color:var(--color-text-secondary)}
+.legend span{display:flex;align-items:center;gap:4px}
+.swatch{width:10px;height:10px;border-radius:2px;display:inline-block}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:600px){.two-col{grid-template-columns:1fr}}
+.risk-table{width:100%;border-collapse:collapse;font-size:13px}
+.risk-table th{text-align:left;padding:6px 8px;border-bottom:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary);font-weight:500}
+.risk-table td{padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
+.badge{display:inline-block;padding:2px 8px;border-radius:var(--border-radius-md);font-size:11px}
+.badge-red{background:var(--color-background-danger);color:var(--color-text-danger)}
+.badge-green{background:var(--color-background-success);color:var(--color-text-success)}
+.badge-amber{background:var(--color-background-warning);color:var(--color-text-warning)}
+.ml-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem}
+.ml-model{margin-bottom:1rem}
+.ml-model-name{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:8px}
+.ml-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.ml-metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:6px 8px;text-align:center}
+.ml-metric .mk{font-size:11px;color:var(--color-text-secondary)}
+.ml-metric .mv{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+.bar-h{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.bar-h .blabel{font-size:12px;color:var(--color-text-secondary);width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.bar-h .btrack{flex:1;background:var(--color-background-secondary);border-radius:2px;height:14px;overflow:hidden}
+.bar-h .bfill{height:100%;border-radius:2px}
+.bar-h .bval{font-size:12px;color:var(--color-text-secondary);min-width:36px;text-align:right}
+.insight-card{background:var(--color-background-secondary);border-radius:var(--border-radius-lg);padding:1rem;margin-bottom:.75rem;border-left:3px solid}
+.insight-card.red{border-left-color:#E24B4A}
+.insight-card.green{border-left-color:#639922}
+.insight-card.amber{border-left-color:#BA7517}
+.insight-card h4{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.insight-card p{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+</style>
+
+<div class="dash">
+<div class="top-bar">
+  <h1>Global Economic Crisis Dashboard &mdash; 2000–2035</h1>
+  <div class="tabs">
+    <button class="tab active" onclick="showPanel('overview')">Overview</button>
+    <button class="tab" onclick="showPanel('inflation')">Inflation</button>
+    <button class="tab" onclick="showPanel('risk')">Risk Analysis</button>
+    <button class="tab" onclick="showPanel('future')">Future Outlook</button>
+    <button class="tab" onclick="showPanel('ml')">ML Models</button>
+    <button class="tab" onclick="showPanel('insights')">Insights</button>
+  </div>
+</div>
+
+<div id="overview" class="panel active">
+  <div class="metrics">
+    <div class="metric"><div class="label">Countries tracked</div><div class="val">47</div><div class="sub">6 regions</div></div>
+    <div class="metric"><div class="label">Years covered</div><div class="val">36</div><div class="sub">2000–2035</div></div>
+    <div class="metric"><div class="label">High-risk records</div><div class="val">1,090</div><div class="sub">64% of dataset</div></div>
+    <div class="metric"><div class="label">Future predictions</div><div class="val">470</div><div class="sub">2026–2035</div></div>
+    <div class="metric"><div class="label">Avg collapse prob</div><div class="val">60.4%</div><div class="sub">All countries</div></div>
+  </div>
+  <div class="two-col">
+    <div class="chart-wrap">
+      <div class="chart-title">Collapse probability by region</div>
+      <div class="legend">
+        <span><span class="swatch" style="background:#E24B4A"></span>High risk (&gt;70%)</span>
+        <span><span class="swatch" style="background:#BA7517"></span>Medium</span>
+        <span><span class="swatch" style="background:#639922"></span>Lower risk</span>
+      </div>
+      <div style="position:relative;height:220px"><canvas id="regionChart" role="img" aria-label="Bar chart showing average collapse probability by region. Africa and Americas have the highest at around 74% and 72%.">Africa 74%, Americas 72%, Asia-Pacific 60%, Europe 53%, South Asia 51%, Middle East 48%.</canvas></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Avg GDP growth by region</div>
+      <div style="position:relative;height:220px"><canvas id="gdpRegionChart" role="img" aria-label="GDP growth bar chart by region">Africa 3.44%, Asia-Pacific 3.48%, South Asia 2.79%, Europe 2.02%, Middle East 1.32%, Americas -0.09%</canvas></div>
+    </div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title">Economic collapse probability — top 15 countries (2023–2024 average)</div>
+    <div id="collapseTable"></div>
+  </div>
+</div>
+
+<div id="inflation" class="panel">
+  <div class="chart-wrap">
+    <div class="chart-title">Inflation rate trends — top 5 crisis countries (2000–2025, capped at 300%)</div>
+    <div class="legend">
+      <span><span class="swatch" style="background:#E24B4A"></span>Venezuela</span>
+      <span><span class="swatch" style="background:#3266ad"></span>Lebanon</span>
+      <span><span class="swatch" style="background:#BA7517"></span>Zimbabwe</span>
+      <span><span class="swatch" style="background:#639922"></span>Argentina</span>
+      <span><span class="swatch" style="background:#7F77DD"></span>Sri Lanka</span>
+    </div>
+    <div style="position:relative;height:320px"><canvas id="inflChart" role="img" aria-label="Line chart of inflation trends for 5 high-risk countries from 2000 to 2025">Venezuela peaks at extreme hyperinflation; Zimbabwe had hyperinflation around 2008; Argentina and Lebanon spiked in 2022-23.</canvas></div>
+  </div>
+  <div class="two-col">
+    <div class="chart-wrap">
+      <div class="chart-title">War/conflict vs peacetime economic impact</div>
+      <div class="legend">
+        <span><span class="swatch" style="background:#E24B4A"></span>War/Conflict</span>
+        <span><span class="swatch" style="background:#639922"></span>No conflict</span>
+      </div>
+      <div style="position:relative;height:200px"><canvas id="warChart" role="img" aria-label="Grouped bar chart comparing economic metrics between war and non-war periods">War periods show higher collapse probability (87% vs 59%), higher unemployment (14.6% vs 8.9%), and negative GDP growth.</canvas></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Inflation crisis level distribution</div>
+      <div style="position:relative;height:200px"><canvas id="crisisChart" role="img" aria-label="Donut chart of inflation crisis levels">Shows distribution of High, Medium, and Low inflation crisis levels across dataset.</canvas></div>
+    </div>
+  </div>
+</div>
+
+<div id="risk" class="panel">
+  <div class="two-col">
+    <div class="chart-wrap">
+      <div class="chart-title">External debt vs forex reserves (bubble = collapse risk)</div>
+      <div style="position:relative;height:280px"><canvas id="debtForexChart" role="img" aria-label="Bubble chart of external debt to GDP vs forex reserves. Larger bubbles indicate higher collapse probability.">Venezuela has extreme debt; Japan and Greece have high debt but poor forex; Saudi Arabia and India are low risk.</canvas></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Risk ranking — top 15 high-risk countries</div>
+      <div id="riskRankBars"></div>
+    </div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title">Currency devaluation vs sovereign default risk</div>
+    <div style="position:relative;height:240px"><canvas id="currencyChart" role="img" aria-label="Scatter plot of currency devaluation vs sovereign default risk score by country">Higher devaluation correlates with higher default risk. Venezuela and Zimbabwe are extreme outliers.</canvas></div>
+  </div>
+</div>
+
+<div id="future" class="panel">
+  <div class="metrics">
+    <div class="metric"><div class="label">Strongest economy</div><div class="val">India</div><div class="sub">7.3% GDP growth</div></div>
+    <div class="metric"><div class="label">Rising star</div><div class="val">Bangladesh</div><div class="sub">7.0% GDP growth</div></div>
+    <div class="metric"><div class="label">Most at-risk</div><div class="val">Venezuela</div><div class="sub">-8.8% GDP</div></div>
+    <div class="metric"><div class="label">Recovery leader</div><div class="val">Upper-Middle</div><div class="sub">75.96 recovery score</div></div>
+  </div>
+  <div class="two-col">
+    <div class="chart-wrap">
+      <div class="chart-title">Future GDP growth forecast (2026–2035)</div>
+      <div class="legend">
+        <span><span class="swatch" style="background:#639922"></span>Strong (&gt;4%)</span>
+        <span><span class="swatch" style="background:#BA7517"></span>Moderate</span>
+        <span><span class="swatch" style="background:#E24B4A"></span>Declining</span>
+      </div>
+      <div style="position:relative;height:280px"><canvas id="futureGdpChart" role="img" aria-label="Horizontal bar chart of projected future GDP growth rates by country">India leads at 7.27%, followed by Bangladesh and China. Venezuela shows the worst outlook at -8.78%.</canvas></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Recovery potential by income level</div>
+      <div style="position:relative;height:200px"><canvas id="recoveryChart" role="img" aria-label="Bar chart of recovery potential score by income level">Upper-middle income countries have the highest recovery potential at 75.96, low income at 61.8.</canvas></div>
+    </div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title">Strong vs vulnerable economies — 2030 outlook</div>
+    <div id="futureTable"></div>
+  </div>
+</div>
+
+<div id="ml" class="panel">
+  <div class="metrics">
+    <div class="metric"><div class="label">Target variable</div><div class="val">High_Risk</div><div class="sub">Binary flag</div></div>
+    <div class="metric"><div class="label">Training split</div><div class="val">80/20</div><div class="sub">1,354 / 338</div></div>
+    <div class="metric"><div class="label">Best model</div><div class="val">RF</div><div class="sub">100% accuracy</div></div>
+    <div class="metric"><div class="label">Features used</div><div class="val">10</div><div class="sub">Key indicators</div></div>
+  </div>
+  <div class="two-col">
+    <div class="chart-wrap">
+      <div class="chart-title">Model performance comparison</div>
+      <div style="position:relative;height:220px"><canvas id="mlChart" role="img" aria-label="Grouped bar chart comparing accuracy, precision, recall and F1 score for 3 ML models">Random Forest and Decision Tree achieve 100% on all metrics. Logistic Regression achieves 99.4%.</canvas></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Feature importance (Random Forest)</div>
+      <div id="featureImportance"></div>
+    </div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title">Model metrics detail</div>
+    <div id="mlDetail"></div>
+  </div>
+</div>
+
+<div id="insights" class="panel">
+  <div style="margin-bottom:1rem;font-size:13px;color:var(--color-text-secondary)">3 actionable insights and 2 key findings from the Global Economic Crisis Analysis</div>
+  <div class="insight-card red">
+    <h4>Insight 1 — Collapse probability is the strongest predictor of economic downfall</h4>
+    <p>Random Forest analysis reveals that Economic_Collapse_Probability alone drives 67% of the High_Risk classification. Countries exceeding 80% collapse probability (Venezuela, Lebanon, Sri Lanka, Ethiopia, Russia, UAE) require immediate policy intervention. The combination of high external debt, low forex reserves, and currency devaluation creates a self-reinforcing collapse spiral.</p>
+  </div>
+  <div class="insight-card amber">
+    <h4>Insight 2 — War and conflict multiply economic risks by 1.5x across all metrics</h4>
+    <p>Countries experiencing active conflict show collapse probability of 87% vs 59% in peacetime — a 47% increase. Unemployment doubles from 8.9% to 14.6%, and GDP growth falls from +2.3% to near-zero. Regional stability programs and ceasefire diplomacy directly translate to measurable economic recovery outcomes. Prioritize peace negotiations as economic policy.</p>
+  </div>
+  <div class="insight-card green">
+    <h4>Insight 3 — South and Southeast Asia will dominate global growth through 2035</h4>
+    <p>India (7.3%), Bangladesh (7.0%), Malaysia (5.6%), Philippines (5.2%), and Indonesia (4.7%) are projected to lead global GDP growth. These countries share structural advantages: young demographics, expanding domestic markets, and improving institutional quality. Investment and trade partnerships with these economies offer the highest forward-looking returns.</p>
+  </div>
+  <div class="insight-card amber">
+    <h4>Finding 1 — Forex reserves are the critical buffer against economic collapse</h4>
+    <p>Forex reserves explain 18.1% of High_Risk prediction (second only to collapse probability itself). Countries maintaining &gt;$100B in reserves (China $866B, India $580B, Saudi Arabia $425B, Japan $401B) show dramatically lower default risk. Recommendation: multilateral forex reserve sharing agreements for vulnerable low-income nations can prevent cascading sovereign defaults.</p>
+  </div>
+  <div class="insight-card red">
+    <h4>Finding 2 — Europe and Americas face structural stagnation risk by 2035</h4>
+    <p>Advanced economies — France (0.09% projected GDP growth), Greece (0.29%), Italy (0.65%), Germany (0.71%), and Japan (0.68%) — face near-zero growth trajectories. Demographic ageing, high existing debt-to-GDP ratios (Japan 232%, Greece 215%), and limited monetary policy space constrain recovery. Structural reforms in labor markets and green infrastructure investment are essential levers.</p>
+  </div>
+  <div style="margin-top:1rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="chart-wrap">
+      <div class="chart-title">Recovery strategies by country type</div>
+      <div id="recoveryStrat"></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Economic risk classification framework</div>
+      <div id="riskClassify"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+const colorsRisk=['#E24B4A','#BA7517','#BAA500','#639922','#3266ad','#7F77DD'];
+
+// OVERVIEW: Region collapse chart
+new Chart(document.getElementById('regionChart'),{
+  type:'bar',
+  data:{
+    labels:['Africa','Americas','Asia-Pacific','Europe','South Asia','Middle East'],
+    datasets:[{
+      label:'Avg collapse probability %',
+      data:[74.3,72.3,59.6,52.9,50.6,48.1],
+      backgroundColor:['#E24B4A','#E24B4A','#BA7517','#BA7517','#639922','#639922'],
+      borderRadius:4
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'rgba(128,128,128,0.1)'}},x:{ticks:{font:{size:11}},grid:{display:false}}}
+  }
+});
+
+// OVERVIEW: GDP region
+new Chart(document.getElementById('gdpRegionChart'),{
+  type:'bar',
+  data:{
+    labels:['Asia-Pac','Africa','S.Asia','Europe','M.East','Americas'],
+    datasets:[{
+      label:'Avg GDP Growth %',
+      data:[3.48,3.44,2.79,2.02,1.32,-0.09],
+      backgroundColor:d=>d.raw>=0?'#639922':'#E24B4A',
+      borderRadius:4
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{y:{ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'rgba(128,128,128,0.1)'}},x:{ticks:{font:{size:11}},grid:{display:false}}}
+  }
+});
+
+// Collapse table
+const collapseData=[
+  ['Afghanistan',99,'High'],['Argentina',99,'High'],['Lebanon',99,'High'],
+  ['Ethiopia',99,'High'],['Hungary',99,'High'],['Mexico',99,'High'],
+  ['Zimbabwe',98,'High'],['Venezuela',99,'High'],['Sri Lanka',97,'High'],
+  ['Russia',96,'High'],['Greece',90,'High'],['Morocco',86,'Medium'],
+  ['Kenya',85,'High'],['Brazil',83,'Medium'],['Ukraine',83,'Medium']
+];
+const ct=document.getElementById('collapseTable');
+ct.innerHTML='<table class="risk-table"><thead><tr><th>Country</th><th>Collapse Probability</th><th>Risk Level</th></tr></thead><tbody>'+
+collapseData.map(([c,p,r])=>`<tr><td>${c}</td><td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;background:var(--color-background-secondary);border-radius:2px;height:12px;overflow:hidden"><div style="width:${p}%;height:100%;background:${r==='High'?'#E24B4A':'#BA7517'};border-radius:2px"></div></div><span style="font-size:12px;min-width:36px">${p}%</span></div></td><td><span class="badge ${r==='High'?'badge-red':'badge-amber'}">${r}</span></td></tr>`).join('')+'</tbody></table>';
+
+// INFLATION chart
+const inflYears=[2000,2002,2004,2006,2008,2010,2012,2014,2016,2018,2020,2022,2024];
+const inflData={
+  Venezuela:[411,537,415,538,216,604,568,559,312,5000,2000,555,501],
+  Lebanon:[70,59,39,18,42,63,65,28,38,73,85,170,62],
+  Zimbabwe:[92,126,118,90,300,24,85,82,89,86,114,86,120],
+  Argentina:[39,36,39,54,28,31,46,38,47,47,41,45,130],
+  'Sri Lanka':[6,8,3,6,9,8,6,8,2,4,14,40,4]
+};
+new Chart(document.getElementById('inflChart'),{
+  type:'line',
+  data:{
+    labels:inflYears,
+    datasets:[
+      {label:'Venezuela',data:inflData.Venezuela,borderColor:'#E24B4A',backgroundColor:'rgba(226,75,74,0.05)',tension:.3,pointRadius:3},
+      {label:'Lebanon',data:inflData.Lebanon,borderColor:'#3266ad',backgroundColor:'rgba(50,102,173,0.05)',tension:.3,pointRadius:3},
+      {label:'Zimbabwe',data:inflData.Zimbabwe,borderColor:'#BA7517',backgroundColor:'rgba(186,117,23,0.05)',tension:.3,pointRadius:3},
+      {label:'Argentina',data:inflData.Argentina,borderColor:'#639922',backgroundColor:'rgba(99,153,34,0.05)',tension:.3,pointRadius:3},
+      {label:'Sri Lanka',data:inflData['Sri Lanka'],borderColor:'#7F77DD',backgroundColor:'rgba(127,119,221,0.05)',tension:.3,pointRadius:3}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      y:{max:300,ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'rgba(128,128,128,0.1)'},title:{display:true,text:'Inflation % (capped 300)',font:{size:11}}},
+      x:{ticks:{font:{size:11}},grid:{display:false}}
+    }
+  }
+});
+
+// WAR chart
+new Chart(document.getElementById('warChart'),{
+  type:'bar',
+  data:{
+    labels:['Inflation %','GDP Growth %','Collapse Prob %','Unemployment %'],
+    datasets:[
+      {label:'War/Conflict',data:[13.0,-0.03,86.9,14.6],backgroundColor:'rgba(226,75,74,0.8)',borderRadius:3},
+      {label:'No conflict',data:[10.0,2.28,58.7,8.9],backgroundColor:'rgba(99,153,34,0.8)',borderRadius:3}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{x:{ticks:{font:{size:10}},grid:{display:false}},y:{ticks:{font:{size:11}},grid:{color:'rgba(128,128,128,0.1)'}}}
+  }
+});
+
+// Crisis level donut
+new Chart(document.getElementById('crisisChart'),{
+  type:'doughnut',
+  data:{
+    labels:['High','Medium','Low'],
+    datasets:[{data:[38,35,27],backgroundColor:['#E24B4A','#BA7517','#639922'],borderWidth:0}]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}}
+  }
+});
+
+// RISK: Debt vs Forex bubble
+const bubbleCountries=['Venezuela','Greece','Japan','Lebanon','Sri Lanka','India','Saudi Arabia','Germany','China','Pakistan'];
+const debtData=[287,215,232,172,91,97,23,69,47,92];
+const forexData=[48,4,401,58,66,580,425,203,866,20];
+const collapseProb=[99,90,69,98,97,5,2,15,73,58];
+new Chart(document.getElementById('debtForexChart'),{
+  type:'bubble',
+  data:{
+    datasets:[{
+      label:'Countries',
+      data:bubbleCountries.map((c,i)=>({x:debtData[i],y:forexData[i],r:Math.max(6,Math.min(30,collapseProb[i]/5)),label:c})),
+      backgroundColor:bubbleCountries.map((c,i)=>collapseProb[i]>70?'rgba(226,75,74,0.6)':collapseProb[i]>40?'rgba(186,117,23,0.6)':'rgba(99,153,34,0.6)'),
+      borderColor:'transparent'
+    }]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:d=>`${bubbleCountries[d.dataIndex]}: Debt ${debtData[d.dataIndex]}%, Forex $${forexData[d.dataIndex]}B, Risk ${collapseProb[d.dataIndex]}%`}}
+    },
+    scales:{
+      x:{title:{display:true,text:'External Debt to GDP %',font:{size:11}},ticks:{font:{size:11}},grid:{color:'rgba(128,128,128,0.1)'},min:-20,max:340},
+      y:{title:{display:true,text:'Forex Reserves ($B)',font:{size:11}},ticks:{font:{size:11}},grid:{color:'rgba(128,128,128,0.1)'},min:-50,max:960}
+    }
+  }
+});
+
+// Risk rank bars
+const rrData=[
+  ['Venezuela',99.0],['Lebanon',98.4],['Sri Lanka',97.5],['Hungary',97.5],['Ethiopia',97.2],
+  ['Russia',96.3],['UAE',96.5],['Greece',90.4],['Mexico',92.4],['New Zealand',89.9],
+  ['Morocco',86.3],['Kenya',85.0],['Brazil',82.9],['Myanmar',84.1],['Ukraine',83.1]
+];
+document.getElementById('riskRankBars').innerHTML=rrData.map(([c,v])=>`
+<div class="bar-h">
+  <div class="blabel" style="width:110px;font-size:12px">${c}</div>
+  <div class="btrack"><div class="bfill" style="width:${v}%;background:${v>90?'#E24B4A':v>70?'#BA7517':'#639922'}"></div></div>
+  <div class="bval">${v}%</div>
+</div>`).join('');
+
+// Currency scatter
+const currData=[
+  {c:'Venezuela',x:45,y:85},{c:'Zimbabwe',x:32,y:70},{c:'Lebanon',x:28,y:65},
+  {c:'Argentina',x:25,y:55},{c:'Sri Lanka',x:22,y:50},{c:'Turkey',x:18,y:42},
+  {c:'Russia',x:20,y:48},{c:'Egypt',x:15,y:40},{c:'Pakistan',x:12,y:35},
+  {c:'India',x:3,y:8},{c:'Germany',x:2,y:5},{c:'Saudi Arabia',x:1,y:3}
+];
+new Chart(document.getElementById('currencyChart'),{
+  type:'scatter',
+  data:{datasets:[{
+    label:'Country',
+    data:currData.map(d=>({x:d.x,y:d.y,label:d.c})),
+    backgroundColor:currData.map(d=>d.x>20?'rgba(226,75,74,0.7)':d.x>10?'rgba(186,117,23,0.7)':'rgba(99,153,34,0.7)'),
+    pointRadius:7
+  }]},
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:d=>`${currData[d.dataIndex].c}: Devaluation ${d.raw.x}%, Default Risk ${d.raw.y}`}}},
+    scales:{
+      x:{title:{display:true,text:'Currency Devaluation %',font:{size:11}},ticks:{font:{size:11}},grid:{color:'rgba(128,128,128,0.1)'},min:-5,max:55},
+      y:{title:{display:true,text:'Sovereign Default Risk Score',font:{size:11}},ticks:{font:{size:11}},grid:{color:'rgba(128,128,128,0.1)'},min:-5,max:100}
+    }
+  }
+});
+
+// FUTURE: GDP forecast horizontal bar
+const futureCountries=['India','Bangladesh','China','Ethiopia','Malaysia','Philippines','Kenya','Indonesia','Qatar','Poland','UK','USA','Canada','Germany','Japan','Italy','Greece','France','Lebanon','Venezuela'];
+const futureVals=[7.27,7.01,7.0,6.90,5.59,5.23,4.79,4.72,4.41,4.17,2.1,1.9,1.55,0.71,0.68,0.65,0.29,0.09,-5.49,-8.78];
+new Chart(document.getElementById('futureGdpChart'),{
+  type:'bar',
+  data:{
+    labels:futureCountries,
+    datasets:[{
+      label:'Projected GDP Growth %',
+      data:futureVals,
+      backgroundColor:futureVals.map(v=>v>=4?'#639922':v>=1?'#BA7517':'#E24B4A'),
+      borderRadius:3
+    }]
+  },
+  options:{
+    indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{x:{ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'rgba(128,128,128,0.1)'}},y:{ticks:{font:{size:10}},grid:{display:false}}}
+  }
+});
+
+// Recovery by income
+new Chart(document.getElementById('recoveryChart'),{
+  type:'bar',
+  data:{
+    labels:['Low','Lower-Middle','High','Upper-Middle'],
+    datasets:[{data:[61.8,69.7,59.2,76.0],backgroundColor:['#E24B4A','#BA7517','#3266ad','#639922'],borderRadius:4}]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{y:{max:100,ticks:{font:{size:11}},grid:{color:'rgba(128,128,128,0.1)'}},x:{ticks:{font:{size:11}},grid:{display:false}}}
+  }
+});
+
+// Future table
+const ft=document.getElementById('futureTable');
+const strongEcon=[['India',7.27,'Strong','Asia-Pacific'],['Bangladesh',7.01,'Strong','South Asia'],['China',7.0,'Strong','Asia-Pacific'],['Ethiopia',6.9,'High Growth','Africa'],['Malaysia',5.59,'Strong','Asia-Pacific'],['Philippines',5.23,'Strong','Asia-Pacific']];
+const weakEcon=[['Venezuela',-8.78,'Collapse','Americas'],['Lebanon',-5.49,'Collapse','Middle East'],['Afghanistan',-4.63,'Collapse','South Asia'],['France',0.09,'Stagnant','Europe'],['Greece',0.29,'Stagnant','Europe']];
+ft.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem"><div><div style="font-size:12px;font-weight:500;color:var(--color-text-success);margin-bottom:8px">Strong economies 2026–2035</div><table class="risk-table"><thead><tr><th>Country</th><th>GDP %</th><th>Status</th></tr></thead><tbody>'+strongEcon.map(([c,g,s])=>`<tr><td>${c}</td><td style="color:#639922;font-weight:500">${g}%</td><td><span class="badge badge-green">${s}</span></td></tr>`).join('')+'</tbody></table></div><div><div style="font-size:12px;font-weight:500;color:var(--color-text-danger);margin-bottom:8px">Vulnerable economies 2026–2035</div><table class="risk-table"><thead><tr><th>Country</th><th>GDP %</th><th>Status</th></tr></thead><tbody>'+weakEcon.map(([c,g,s])=>`<tr><td>${c}</td><td style="color:#E24B4A;font-weight:500">${g}%</td><td><span class="badge badge-red">${s}</span></td></tr>`).join('')+'</tbody></table></div></div>';
+
+// ML comparison chart
+new Chart(document.getElementById('mlChart'),{
+  type:'bar',
+  data:{
+    labels:['Accuracy','Precision','Recall','F1-Score'],
+    datasets:[
+      {label:'Logistic Reg',data:[99.4,99.5,99.5,99.5],backgroundColor:'rgba(50,102,173,0.8)',borderRadius:3},
+      {label:'Random Forest',data:[100,100,100,100],backgroundColor:'rgba(99,153,34,0.8)',borderRadius:3},
+      {label:'Decision Tree',data:[100,100,100,100],backgroundColor:'rgba(127,119,221,0.8)',borderRadius:3}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{y:{min:98,max:101,ticks:{callback:v=>v+'%',font:{size:11}},grid:{color:'rgba(128,128,128,0.1)'}},x:{ticks:{font:{size:11}},grid:{display:false}}}
+  }
+});
+
+// Feature importance
+const fiData=[['Economic Collapse Probability',67.0],['Forex Reserves',18.1],['External Debt/GDP',5.8],['Currency Devaluation',3.8],['Sovereign Default Risk',1.8],['Inflation Rate',1.7],['Unemployment Rate',0.9],['GDP Growth Rate',0.8],['Political Instability',0.2],['War/Conflict Flag',0.0]];
+const fic=['#E24B4A','#BA7517','#BA7517','#BA7517','#3266ad','#3266ad','#639922','#639922','#639922','#888'];
+document.getElementById('featureImportance').innerHTML=fiData.map(([f,v],i)=>`
+<div class="bar-h">
+  <div class="blabel" style="font-size:11px;width:180px">${f}</div>
+  <div class="btrack"><div class="bfill" style="width:${v}%;background:${fic[i]}"></div></div>
+  <div class="bval" style="font-size:11px">${v}%</div>
+</div>`).join('');
+
+// ML detail table
+const mlMods=[
+  ['Logistic Regression','99.4%','99.5%','99.5%','99.5%'],
+  ['Random Forest','100.0%','100.0%','100.0%','100.0%'],
+  ['Decision Tree','100.0%','100.0%','100.0%','100.0%']
+];
+document.getElementById('mlDetail').innerHTML='<table class="risk-table"><thead><tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1-Score</th></tr></thead><tbody>'+mlMods.map(([m,a,p,r,f])=>`<tr><td style="font-weight:500">${m}</td><td style="color:#639922">${a}</td><td style="color:#639922">${p}</td><td style="color:#639922">${r}</td><td style="color:#639922">${f}</td></tr>`).join('')+'</tbody></table>';
+
+// Recovery strategies
+document.getElementById('recoveryStrat').innerHTML=[
+  ['Debt-restructuring','Lebanon, Argentina, Greece','Negotiate IMF bailout, haircut creditors'],
+  ['Export diversification','Zimbabwe, Venezuela','Move away from single commodity dependency'],
+  ['Monetary reform','Sri Lanka, Turkey','Independent central bank, currency board'],
+  ['Conflict resolution','Afghanistan, Ukraine','Peace dividends: FDI, trade resumption'],
+  ['Institutional reform','Ethiopia, Kenya','Anti-corruption, rule of law, property rights']
+].map(([s,c,d])=>`<div style="margin-bottom:10px;padding:8px;background:var(--color-background-secondary);border-radius:var(--border-radius-md)"><div style="font-size:12px;font-weight:500;color:var(--color-text-primary)">${s}</div><div style="font-size:11px;color:var(--color-text-info);margin:2px 0">${c}</div><div style="font-size:11px;color:var(--color-text-secondary)">${d}</div></div>`).join('');
+
+// Risk classification
+document.getElementById('riskClassify').innerHTML=[
+  ['Critical risk','Collapse prob &gt;90%, Debt &gt;150%','Immediate IMF intervention needed','badge-red'],
+  ['High risk','Collapse prob 70–90%','Fiscal consolidation, forex boost','badge-red'],
+  ['Medium risk','Collapse prob 40–70%','Structural reforms, export growth','badge-amber'],
+  ['Monitored','Collapse prob 20–40%','Policy monitoring, debt management','badge-amber'],
+  ['Stable','Collapse prob &lt;20%','Maintain reserves, diversify','badge-green']
+].map(([level,criteria,action,badge])=>`<div style="margin-bottom:8px;padding:8px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);display:flex;gap:8px;align-items:flex-start"><div><span class="badge ${badge}" style="font-size:10px;white-space:nowrap">${level}</span></div><div><div style="font-size:11px;color:var(--color-text-secondary)">${criteria}</div><div style="font-size:11px;color:var(--color-text-primary);margin-top:2px">${action}</div></div></div>`).join('');
+</script>
